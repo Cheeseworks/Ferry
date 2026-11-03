@@ -104,7 +104,7 @@ jobs:
 
             - name: Send Discord webhook
               if: ${{ steps.check-discord.outputs.has-nightly-webhook == 'true' }}
-              uses: BlueWitherer/discord-webhook@main
+              uses: Cheeseworks/discord-webhook@main
               with:
                   webhook-url: ${{ secrets.NIGHTLY_WEBHOOK }}
                   files: |

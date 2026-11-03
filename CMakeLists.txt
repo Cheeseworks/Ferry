@@ -28,5 +28,5 @@ add_subdirectory($ENV{GEODE_SDK} ${CMAKE_CURRENT_BINARY_DIR}/geode)
 setup_geode_mod(${PROJECT_NAME})
 
 CPMAddPackage("gh:dankmeme01/dbuf@1.1.0")
-CPMAddPackage("gh:BlueWitherer/rhatts-geode-sillies#main")
+CPMAddPackage("gh:Cheeseworks/rhatts-geode-sillies#main")
 target_link_libraries(${PROJECT_NAME} dbuf rhatt)
