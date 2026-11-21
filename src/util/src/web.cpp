@@ -1,6 +1,6 @@
 #include "../web.hpp"
 
-#include <Util.h>
+#include <cw.h>
 
 #include <Geode/Geode.hpp>
 
@@ -18,7 +18,7 @@ web::WebRequest request::withAuth(std::string token) {
 }
 
 arc::Future<web::WebRequest> request::withAuthCo(std::string token) {
-    co_return *co_await async::waitForMainThread<web::WebRequest>([t = std::move(token)]() {
+    co_return *co_await async::waitForMainThread<web::WebRequest>([t = std::move(token)]() mutable {
         return withAuth(std::move(t));
     });
 }

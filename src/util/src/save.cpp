@@ -1,6 +1,6 @@
 #include "../save.hpp"
 
-#include <Util.h>
+#include <cw.h>
 
 #include <Geode/Geode.hpp>
 
@@ -154,12 +154,12 @@ void save::geode::applySettings(Mod* mod, matjson::Value const& data) {
     auto msm = ModSettingsManager::from(mod);
 
     (void)msm->load(data);
-    auto const saved = msm->save();
+    auto saved = msm->save();
 
-    for (auto const& [key, value] : saved) {
+    for (auto& [key, value] : saved) {
         auto const& old = prev[key];
 
-        if (value != old) queueInMainThread([mod, key]() {
+        if (value != old) queueInMainThread([mod, key = std::move(key)]() {
             log::trace("Sending setting change event for {}/{}", mod->getID(), key);
             SettingChangedEvent(mod->getID(), key).send(mod->getSetting(key));
         });

@@ -14,17 +14,13 @@ namespace cw::ferry {
 
     namespace ui {
         class SyncPopup final : public geode::Popup {
+            using TaskResult = arc::Future<geode::Result<>>;
+
             struct SaveButtonData final {
                 std::string id;
                 std::string text;
                 std::string icon;
                 std::string background;
-                geode::Button::ButtonCallback callback = nullptr;
-            };
-
-            struct LinkButton final {
-                std::string id;
-                std::string sprite;
                 geode::Button::ButtonCallback callback = nullptr;
             };
 
@@ -38,20 +34,20 @@ namespace cw::ferry {
 
             asp::SmallVec<SyncType, 4> getSyncTypes() const;
 
-            arc::Future<geode::Result<>> runTaskForIndex(uint8_t i, bool upload = false);
+            TaskResult runTaskForIndex(uint8_t i, bool upload = false);
 
-            arc::Future<geode::Result<>> startGVUploadTask();
-            arc::Future<geode::Result<>> startGVDownloadTask();
+            TaskResult startGVUploadTask();
+            TaskResult startGVDownloadTask();
 
-            arc::Future<geode::Result<>> startGeodeUploadTask();
-            arc::Future<geode::Result<>> startGeodeDownloadTask();
+            TaskResult startGeodeUploadTask();
+            TaskResult startGeodeDownloadTask();
 
-            arc::Future<geode::Result<>> startModUploadTask();
-            arc::Future<geode::Result<>> startModDownloadTask();
+            TaskResult startModUploadTask();
+            TaskResult startModDownloadTask();
 
         protected:
-            arc::Future<geode::Result<>> runUploadTasks();
-            arc::Future<geode::Result<>> runDownloadTasks();
+            TaskResult runUploadTasks();
+            TaskResult runDownloadTasks();
 
             void onExit() override;
 

@@ -1,16 +1,9 @@
-cmake_minimum_required(VERSION 3.21)
+cmake_minimum_required(VERSION 3.28)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-if("${CMAKE_SYSTEM_NAME}" STREQUAL "iOS" OR IOS)
-    set(CMAKE_OSX_ARCHITECTURES "arm64")
-else()
-    set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64")
-endif()
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 
 project(Ferry VERSION 1.2.1)
-
-set(CW_ENABLE_WEB ON CACHE BOOL "" FORCE)
 
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS src/*.cpp)
 add_library(${PROJECT_NAME} SHARED ${SOURCES})
@@ -26,6 +19,11 @@ endif()
 add_subdirectory($ENV{GEODE_SDK} ${CMAKE_CURRENT_BINARY_DIR}/geode)
 
 setup_geode_mod(${PROJECT_NAME})
+
+option(CW_TESTING "Enable local testing mode" ON)
+if(CW_TESTING)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE CW_TESTING=1)
+endif()
 
 CPMAddPackage("gh:dankmeme01/dbuf@1.1.0")
 CPMAddPackage("gh:Cheeseworks/rhatts-geode-sillies#main")

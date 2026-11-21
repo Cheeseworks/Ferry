@@ -1,6 +1,6 @@
 #include "../SyncPopup.hpp"
 
-#include <Util.h>
+#include <cw.h>
 
 #include <ranges>
 
@@ -20,13 +20,6 @@ namespace cw::ferry {
                 node->removeFromParent();
                 node = nullptr;
             };
-        }
-
-        void rescale(CCNode* node, float targetSize) {
-            auto size = node->getScaledContentSize();
-            auto scale = targetSize / size.height;
-
-            node->setScale(scale);
         }
 
         static void removeOptionsLayer() {
@@ -64,10 +57,10 @@ bool SyncSelect::init(SyncType type, Callback&& cb) {
     if (!CCMenu::init()) return false;
 
     setID(impl::getSyncTypeID(m_type));
-    setContentSize({ 50.f, 32.5f });
-    setAnchorPoint({ 0.5, 0.5 });
+    setContentSize({ 50.0f, 32.5f });
+    setAnchorPoint(cw::anchor::center);
 
-    auto bg = NineSlice::create("geode.loader/black-square.png");
+    auto bg = NineSlice::create("black-square.png"_gode);
     bg->setZOrder(-9);
     bg->setContentSize(getScaledContentSize());
 
@@ -85,7 +78,7 @@ bool SyncSelect::init(SyncType type, Callback&& cb) {
     toggle->setID(fmt::format("{}-toggler", impl::getSyncTypeID(m_type)));
     toggle->setZOrder(9);
 
-    addChildAtPosition(toggle, Anchor::Left, { toggle->getScaledContentWidth() * 0.625f, 0.f });
+    addChildAtPosition(toggle, Anchor::Left, { toggle->getScaledContentWidth() * 0.625f, 0.0f });
 
     auto saved = Mod::get()->getSavedValue<bool>(impl::getSyncTypeID(m_type), m_type == SyncType::GameSettings);
 
@@ -98,7 +91,7 @@ bool SyncSelect::init(SyncType type, Callback&& cb) {
     label->setAnchorPoint({ 0, 0.5 });
     label->setMaxWidth(57.5f);
 
-    addChildAtPosition(label, Anchor::Left, { toggle->getScaledContentWidth() * 1.25f, 0.f });
+    addChildAtPosition(label, Anchor::Left, { toggle->getScaledContentWidth() * 1.25f, 0.0f });
 
     setContentWidth((toggle->getScaledContentWidth() * 1.125f) + label->getScaledContentWidth() * 1.125f);
 
@@ -121,7 +114,7 @@ SyncSelect* SyncSelect::create(SyncType type, Callback&& cb) {
 }
 
 bool SyncPopup::init() {
-    if (!Popup::init({ 250.f, 235.f })) return false;
+    if (!Popup::init({ 250.0f, 235.0f })) return false;
 
     setID("sync-menu"_spr);
     setTitle("Ferry");
@@ -129,16 +122,16 @@ bool SyncPopup::init() {
     auto menuLayout = ColumnLayout::create()
                           ->setGap(6.25f)
                           ->setAutoScale(false)
-                          ->setAutoGrowAxis(10.f)
+                          ->setAutoGrowAxis(10.0f)
                           ->setAxisReverse(true);
 
     auto menu = CCNode::create();
     menu->setID("btn-container");
-    menu->setAnchorPoint({ 0.5, 0.5 });
-    menu->setContentSize({ 170.f, 65.f });
+    menu->setAnchorPoint(cw::anchor::center);
+    menu->setContentSize({ 170.0f, 65.0f });
     menu->setLayout(menuLayout);
 
-    m_mainLayer->addChildAtPosition(menu, Anchor::Center, { 0.f, 30.f });
+    m_mainLayer->addChildAtPosition(menu, Anchor::Center, { 0.0f, 30.0f });
 
     auto btns = std::array{
         SaveButtonData{
@@ -186,7 +179,7 @@ bool SyncPopup::init() {
         SaveButtonData{
             "download-btn",
             "Load to Game",
-            "geode.loader/install.png",
+            "install.png"_gode,
             "GJ_button_01.png",
             [this](auto) {
                 if (m_toSync.lock()->empty()) return Notification::create("No option selected", NotificationIcon::Error)->show();
@@ -205,6 +198,7 @@ bool SyncPopup::init() {
                             impl::resetNode(m_progressPopup);
 
                             m_progressPopup = ProcessPopup::create("Preparing download...");
+                            m_progressPopup->getCurrentMessage();
                             m_progressPopup->setCloseCallback([this](ProcessPopup* self, ProcessPopup::State state) {
                                 if (state != ProcessPopup::State::Success) {
                                     m_tasks.cancel();
@@ -241,16 +235,16 @@ bool SyncPopup::init() {
         auto btnSprsLayout = RowLayout::create()
                                  ->setGap(2.5f)
                                  ->setAutoScale(false)
-                                 ->setAutoGrowAxis(65.f);
+                                 ->setAutoGrowAxis(65.0f);
 
         auto btnSprs = CCNode::create();
-        btnSprs->setAnchorPoint({ 0.5, 0.5 });
-        btnSprs->setContentSize({ menu->getScaledContentWidth() - 15.f, 65.f });
+        btnSprs->setAnchorPoint(cw::anchor::center);
+        btnSprs->setContentSize({ menu->getScaledContentWidth() - 15.0f, 65.0f });
         btnSprs->setLayout(btnSprsLayout);
 
         auto btnSprIcon = CCSprite::createWithSpriteFrameName(b.icon.c_str());
 
-        impl::rescale(btnSprIcon, 12.5f);
+        limitNodeHeight(btnSprIcon, 12.5f, 1.0f, 0.125f);
 
         auto btnSprLabel = Label::create(std::move(b.text), "bigFont.fnt");
         btnSprLabel->setScale(0.475f);
@@ -282,13 +276,13 @@ bool SyncPopup::init() {
     auto infoLabel = Label::createRich(
         "Sync your <cg>game settings</c> with <cf>Ferry's cloud service</c>.\n"
         "Saving or loading data will always result in <cr>overrides</c>.",
-        "geode.loader/mdFontB.fnt"
+        "mdFontB.fnt"_gode
     );
     infoLabel->setScale(0.4f);
     infoLabel->setAlignment(Label::Alignment::Center);
     infoLabel->setAnchorPoint({ 0.5, 1 });
 
-    m_mainLayer->addChildAtPosition(infoLabel, Anchor::Top, { 0.f, -32.5f });
+    m_mainLayer->addChildAtPosition(infoLabel, Anchor::Top, { 0.0f, -32.5f });
 
     auto gjam = GJAccountManager::sharedState();
 
@@ -304,7 +298,7 @@ bool SyncPopup::init() {
     loginLabel->setAlignment(Label::Alignment::Center);
     loginLabel->setAnchorPoint({ 0.5, 0 });
 
-    m_mainLayer->addChildAtPosition(loginLabel, Anchor::Bottom, { 0.f, 12.5f });
+    m_mainLayer->addChildAtPosition(loginLabel, Anchor::Bottom, { 0.0f, 12.5f });
 
     auto toggleMenuLayout = RowLayout::create()
                                 ->setGap(3.75f)
@@ -315,11 +309,11 @@ bool SyncPopup::init() {
     auto toggleMenu = CCNode::create();
     toggleMenu->setID("toggle-container");
     toggleMenu->setZOrder(1);
-    toggleMenu->setAnchorPoint({ 0.5, 0.5 });
-    toggleMenu->setContentSize({ m_mainLayer->getScaledContentWidth() * 0.625f, 32.5f });
+    toggleMenu->setAnchorPoint(cw::anchor::center);
+    toggleMenu->setContentSize({ m_mainLayer->getScaledContentWidth() * 0.675f, 32.5f });
     toggleMenu->setLayout(toggleMenuLayout);
 
-    m_mainLayer->addChildAtPosition(toggleMenu, Anchor::Center, { 0.f, -52.5f });
+    m_mainLayer->addChildAtPosition(toggleMenu, Anchor::Center, { 0.0f, -52.5f });
 
     static constexpr SyncType types[] = {
         SyncType::GameSettings,
@@ -349,12 +343,12 @@ bool SyncPopup::init() {
     toggleMenuLabel->setScale(0.625f);
     toggleMenuLabel->setAlignment(Label::Alignment::Center);
 
-    m_mainLayer->addChildAtPosition(toggleMenuLabel, Anchor::Center, { 0.f, -40.f + (toggleMenu->getScaledContentHeight() * 0.5f) });
+    m_mainLayer->addChildAtPosition(toggleMenuLabel, Anchor::Center, { 0.0f, -40.0f + (toggleMenu->getScaledContentHeight() * 0.5f) });
 
     auto linkBtnMenuLayout = ColumnLayout::create()
-                                 ->setGap(2.f)
+                                 ->setGap(2.0f)
                                  ->setAutoScale(false)
-                                 ->setAutoGrowAxis(0.f);
+                                 ->setAutoGrowAxis(0.0f);
 
     auto linkBtnMenu = CCNode::create();
     linkBtnMenu->setID("link-container");
@@ -365,7 +359,7 @@ bool SyncPopup::init() {
     m_mainLayer->addChildAtPosition(linkBtnMenu, Anchor::BottomLeft, { 7.5f, 7.5f });
 
     auto linkBtns = std::array{
-        LinkButton{
+        cw::LinkButton{
             "discord-btn",
             "gj_discordIcon_001.png",
             [](auto) {
@@ -381,9 +375,9 @@ bool SyncPopup::init() {
                 );
             },
         },
-        LinkButton{
+        cw::LinkButton{
             "support-me-btn",
-            "geode.loader/gift.png",
+            "gift.png"_gode,
             [](auto) {
                 openSupportPopup(Mod::get());
             },
@@ -403,14 +397,14 @@ bool SyncPopup::init() {
 
     linkBtnMenu->updateLayout();
 
-    cw::ui::nodes::addHelpButton(
+    cw::addHelpButton(
         m_buttonMenu,
         "This is the <cg>Ferry Sync Menu</c>. You can <cy>upload and download your game settings data</c> here, which is linked to <cg>your Geometry Dash account</c>."
     );
 
     auto settingsBtn = Button::createWithNode(
         CircleButtonSprite::createWithSpriteFrameName(
-            "geode.loader/settings.png"
+            "settings.png"_gode
         ),
         [](auto) {
             openSettingsPopup(Mod::get());
@@ -433,7 +427,7 @@ asp::SmallVec<SyncType, 4> SyncPopup::getSyncTypes() const {
     return out;
 }
 
-arc::Future<Result<>> SyncPopup::runTaskForIndex(uint8_t i, bool upload) {
+SyncPopup::TaskResult SyncPopup::runTaskForIndex(uint8_t i, bool upload) {
     switch (static_cast<SyncType>(i)) {
         default: co_return Err("Unknown error");
 
@@ -443,7 +437,7 @@ arc::Future<Result<>> SyncPopup::runTaskForIndex(uint8_t i, bool upload) {
     };
 }
 
-arc::Future<Result<>> SyncPopup::runUploadTasks() {
+SyncPopup::TaskResult SyncPopup::runUploadTasks() {
     auto toSync = m_toSync.lock();
     for (auto const& t : *toSync | std::views::keys) {
         GEODE_CO_UNWRAP(co_await runTaskForIndex(t, true));
@@ -452,7 +446,7 @@ arc::Future<Result<>> SyncPopup::runUploadTasks() {
     co_return Ok();
 }
 
-arc::Future<Result<>> SyncPopup::runDownloadTasks() {
+SyncPopup::TaskResult SyncPopup::runDownloadTasks() {
     auto toSync = m_toSync.lock();
     for (auto const& t : *toSync | std::views::keys) {
         GEODE_CO_UNWRAP(co_await runTaskForIndex(t));
@@ -461,7 +455,7 @@ arc::Future<Result<>> SyncPopup::runDownloadTasks() {
     co_return Ok();
 }
 
-arc::Future<Result<>> SyncPopup::startGVUploadTask() {
+SyncPopup::TaskResult SyncPopup::startGVUploadTask() {
     co_await async::waitForMainThread([this]() { m_progressPopup->updateMessage("Uploading game settings data..."); });
 
     auto const res = co_await save::uploadGameVars();
@@ -470,7 +464,7 @@ arc::Future<Result<>> SyncPopup::startGVUploadTask() {
     co_return Ok();
 }
 
-arc::Future<Result<>> SyncPopup::startGVDownloadTask() {
+SyncPopup::TaskResult SyncPopup::startGVDownloadTask() {
     co_await async::waitForMainThread([this]() { m_progressPopup->updateMessage("Downloading game settings data..."); });
 
     GEODE_CO_UNWRAP_INTO(auto const res, co_await save::downloadGameVars());
@@ -481,7 +475,7 @@ arc::Future<Result<>> SyncPopup::startGVDownloadTask() {
     co_return Ok();
 }
 
-arc::Future<Result<>> SyncPopup::startGeodeUploadTask() {
+SyncPopup::TaskResult SyncPopup::startGeodeUploadTask() {
     co_await async::waitForMainThread([this]() { m_progressPopup->updateMessage("Uploading Geode settings data..."); });
 
     auto const res = co_await save::geode::uploadSettings();
@@ -490,7 +484,7 @@ arc::Future<Result<>> SyncPopup::startGeodeUploadTask() {
     co_return Ok();
 }
 
-arc::Future<Result<>> SyncPopup::startGeodeDownloadTask() {
+SyncPopup::TaskResult SyncPopup::startGeodeDownloadTask() {
     co_await async::waitForMainThread([this]() { m_progressPopup->updateMessage("Downloading Geode settings data..."); });
 
     GEODE_CO_UNWRAP_INTO(auto const res, co_await save::geode::downloadSettings());
@@ -501,7 +495,7 @@ arc::Future<Result<>> SyncPopup::startGeodeDownloadTask() {
     co_return Ok();
 }
 
-arc::Future<Result<>> SyncPopup::startModUploadTask() {
+SyncPopup::TaskResult SyncPopup::startModUploadTask() {
     co_await async::waitForMainThread([this]() { m_progressPopup->updateMessage("Uploading mod settings data..."); });
 
     auto const res = co_await save::geode::mods::uploadSettings();
@@ -510,7 +504,7 @@ arc::Future<Result<>> SyncPopup::startModUploadTask() {
     co_return Ok();
 }
 
-arc::Future<Result<>> SyncPopup::startModDownloadTask() {
+SyncPopup::TaskResult SyncPopup::startModDownloadTask() {
     co_await async::waitForMainThread([this]() { m_progressPopup->updateMessage("Downloading mod settings data..."); });
 
     GEODE_CO_UNWRAP_INTO(auto const res, co_await save::geode::mods::downloadSettings());
