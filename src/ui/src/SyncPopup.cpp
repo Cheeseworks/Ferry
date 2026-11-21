@@ -317,13 +317,13 @@ bool SyncPopup::init() {
 
     m_mainLayer->addChildAtPosition(toggleMenu, Anchor::Center, { 0.0f, -52.5f });
 
-    static constexpr SyncType types[] = {
+    static constexpr SyncType FERRY_SYNC_TYPES[] = {
         SyncType::GameSettings,
         SyncType::GeodeSettings,
         SyncType::ModSettings,
     };
 
-    for (auto t : types) {
+    for (auto t : FERRY_SYNC_TYPES) {
         auto toggle = SyncSelect::create(t, [this](SyncType t, bool on) {
             auto toSync = m_toSync.lock();
             auto i = static_cast<uint8_t>(t);

@@ -12,10 +12,10 @@ using namespace cw::ferry;
 
 namespace cw::ferry {
     namespace main {
-        static asp::SmallVec<std::shared_ptr<Hook>, 1> g_hooks;
+        static asp::SmallVec<std::shared_ptr<Hook>, 1> FERRY_HOOKS;
 
         static void toggleHooks(bool on) {
-            for (auto& hook : g_hooks) (void)hook->toggle(on);
+            for (auto& hook : FERRY_HOOKS) (void)hook->toggle(on);
         }
 
         static void setupHooks(auto& self, std::string_view settingID) {
@@ -26,7 +26,7 @@ namespace cw::ferry {
                 hook->setAutoEnable(enable);
                 (void)hook->toggle(enable);
 
-                g_hooks.push_back(hook);
+                FERRY_HOOKS.push_back(hook);
             };
         }
     };
