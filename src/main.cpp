@@ -70,8 +70,10 @@ class $modify(FerryMenuLayer, MenuLayer) {
                 ),
                 [](auto) {
                     if (!argon::signedIn()) {
+#if !defined(GEODE_IS_IOS) && !defined(GEODE_IS_INTEL_MAC)  // TODO: findings bindings
                         AccountLayer::create()->showLayer(GameManager::sharedState()->getGameVariable(GameVar::FastMenu));
-                        Notification::create("(Ferry) You must be logged in to use Ferry!", NotificationIcon::Warning)->show();
+#endif
+                        Notification::create("You must be logged in to use Ferry!", NotificationIcon::Warning)->show();
 
                         return;
                     };
