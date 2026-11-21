@@ -88,7 +88,7 @@ arc::Future<cw::WebRes> save::uploadGameVars() {
                    (co_await request::withAuthCo(std::move(token))),
                    bw.writtenVec()
     )
-                   .post("/v2/upload"_api);
+                   .post(CW_WEB_BASEURL "/v2/upload");
 
     co_return cw::request::parse(res);
 }
@@ -97,7 +97,7 @@ arc::Future<Result<StringMap<bool>>> save::downloadGameVars() {
     GEODE_CO_UNWRAP_INTO(auto token, co_await argon::startAuth());
 
     auto res = co_await (co_await request::withAuthCo(std::move(token)))
-                   .get("/v2/download"_api);
+                   .get(CW_WEB_BASEURL "/v2/download");
 
     if (res.error()) {
         auto const webResp = cw::request::parse(res);
@@ -137,11 +137,11 @@ void save::applyGameVars(StringMap<bool> const& vars) {
 }
 
 arc::Future<cw::WebRes> save::geode::uploadSettings() {
-    co_return co_await impl::data::uploadSettings("/v2/upload/geode"_api, save::geode::filterSettings(CW_GEODE_ID, save::geode::getSettings(CW_GEODE_ID)));
+    co_return co_await impl::data::uploadSettings(CW_WEB_BASEURL "/v2/upload/geode", save::geode::filterSettings(CW_GEODE_ID, save::geode::getSettings(CW_GEODE_ID)));
 }
 
 arc::Future<Result<matjson::Value>> save::geode::downloadSettings() {
-    co_return co_await impl::data::downloadSettings("/v2/download/geode"_api);
+    co_return co_await impl::data::downloadSettings(CW_WEB_BASEURL "/v2/download/geode");
 }
 
 void save::geode::applySettings(std::string_view modID, matjson::Value const& data) {
@@ -193,7 +193,7 @@ matjson::Value& save::geode::getSettings(Mod* mod) {
 }
 
 arc::Future<cw::WebRes> save::geode::mods::uploadSettings() {
-    auto res = co_await impl::data::uploadSettings("/v2/upload/mods"_api, save::geode::mods::getAllSettings());
+    auto res = co_await impl::data::uploadSettings(CW_WEB_BASEURL "/v2/upload/mods", save::geode::mods::getAllSettings());
     if (res.getCode() == 413) co_await async::waitForMainThread([]() {
         createQuickPopup(
             "Uh oh!",
@@ -208,7 +208,7 @@ arc::Future<cw::WebRes> save::geode::mods::uploadSettings() {
 }
 
 arc::Future<::geode::Result<matjson::Value>> save::geode::mods::downloadSettings() {
-    co_return co_await impl::data::downloadSettings("/v2/download/mods"_api);
+    co_return co_await impl::data::downloadSettings(CW_WEB_BASEURL "/v2/download/mods");
 }
 
 matjson::Value save::geode::mods::getAllSettings() {
