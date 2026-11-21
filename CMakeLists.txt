@@ -23,6 +23,8 @@ setup_geode_mod(${PROJECT_NAME})
 option(CW_TESTING "Enable local testing mode" ON)
 if(CW_TESTING)
     target_compile_definitions(${PROJECT_NAME} PRIVATE CW_TESTING=1)
+else()
+    set(CW_WEB_BASEURL "https://ferry.cheeseworks.gay" CACHE STRING "" FORCE)
 endif()
 
 CPMAddPackage("gh:dankmeme01/dbuf@1.1.0")
