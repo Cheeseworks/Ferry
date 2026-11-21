@@ -370,7 +370,7 @@ bool SyncPopup::init() {
                     "Cancel",
                     "OK",
                     [](auto, bool ok) {
-                        if (ok) web::openLinkInBrowser("https://www.dsc.gg/cheeseworks");
+                        if (ok) web::openLinkInBrowser("https://cwrk.cc/discord");
                     }
                 );
             },
